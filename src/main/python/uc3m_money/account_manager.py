@@ -11,8 +11,17 @@ from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
 
+class _SingletonMeta(type):
+    """
+    Metaclass enforcing that only one instance of a class exists.
+    """
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(_SingletonMeta, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
 
-class AccountManager:
+class AccountManager(metaclass=_SingletonMeta):
     """Class for providing the methods for managing the orders"""
     def __init__(self):
         pass
