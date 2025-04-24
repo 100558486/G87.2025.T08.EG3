@@ -98,6 +98,25 @@ class AccountManager:
         if parsed_date.year < 2025 or parsed_date.year > 2050:
             raise AccountManagementException("Invalid date format")
         return date_str
+
+    @staticmethod
+    def validate_transfer_amount(amount: float) -> float:
+        """
+        Validate transfer amount format and range, returning the numeric value.
+        """
+        try:
+            value = float(amount)
+        except (TypeError, ValueError) as exc:
+            raise AccountManagementException("Invalid transfer amount") from exc
+        # Check for more than two decimal places
+        parts = str(value).split('.')
+        if len(parts) == 2 and len(parts[1]) > 2:
+            raise AccountManagementException("Invalid transfer amount")
+        # Check allowed range
+        if value < 10 or value > 10000:
+            raise AccountManagementException("Invalid transfer amount")
+        return value
+
     #pylint: disable=too-many-arguments
     def transfer_request(self, from_iban: str,
                          to_iban: str,
@@ -116,19 +135,8 @@ class AccountManager:
             raise AccountManagementException("Invalid transfer type")
         self.validate_transfer_date(date)
 
-        try:
-            amount_value  = float(amount)
-        except ValueError as exc:
-            raise AccountManagementException("Invalid transfer amount") from exc
-
-        amount_str = str(amount_value)
-        if '.' in amount_str:
-            decimal_count = len(amount_str.split('.')[1])
-            if decimal_count > 2:
-                raise AccountManagementException("Invalid transfer amount")
-
-        if amount_value < 10 or amount_value > 10000:
-            raise AccountManagementException("Invalid transfer amount")
+        # Validate and parse transfer amount
+        amount_value = self.validate_transfer_amount(amount)
 
         new_transfer = TransferRequest(from_iban=from_iban,
                                      to_iban=to_iban,
