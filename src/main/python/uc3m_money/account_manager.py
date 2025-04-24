@@ -48,18 +48,13 @@ class AccountManager:
         iban = iban[4:] + iban[:4]
 
         # Convertir el IBAN en una cadena numérica, reemplazando letras por números
-        iban = (iban.replace('A', '10').replace('B', '11').
-                replace('C', '12').replace('D', '13').replace('E', '14').
-                replace('F', '15'))
-        iban = (iban.replace('G', '16').replace('H', '17').
-                replace('I', '18').replace('J', '19').replace('K', '20').
-                replace('L', '21'))
-        iban = (iban.replace('M', '22').replace('N', '23').
-                replace('O', '24').replace('P', '25').replace('Q', '26').
-                replace('R', '27'))
-        iban = (iban.replace('S', '28').replace('T', '29').replace('U', '30').
-                replace('V', '31').replace('W', '32').replace('X', '33'))
-        iban = iban.replace('Y', '34').replace('Z', '35')
+        numeric_iban_parts = []
+        for ch in iban:
+            if 'A' <= ch <= 'Z':
+                numeric_iban_parts.append(str(ord(ch) - ord('A') + 10))
+            else:
+                numeric_iban_parts.append(ch)
+        iban = ''.join(numeric_iban_parts)
 
         # Mover los cuatro primeros caracteres al final
 
